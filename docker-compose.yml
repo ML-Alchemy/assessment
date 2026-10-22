@@ -1,0 +1,119 @@
+name: relay
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: relay
+    volumes:
+      - ./app/db:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d relay"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  webhook-api:
+    build: ./app/webhook-api
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build: ./app/worker
+    env_file: .env
+    deploy:
+      replicas: 2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-crm:
+        condition: service_started
+      provider-a:
+        condition: service_started
+      provider-b:
+        condition: service_started
+
+  admin-app:
+    build: ./app/admin-app
+    env_file: .env
+    environment:
+      ADMIN_PUBLIC_URL: http://localhost:8001
+      MOCK_CRM_PUBLIC_URL: http://localhost:9001
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ----- mock external systems -----
+
+  mock-crm:
+    build: ./mocks/mock-crm
+    environment:
+      DEALS_PATH: /fixtures/deals.json
+      MOCK_CRM_CLIENT_ID: ${MOCK_CRM_CLIENT_ID}
+      MOCK_CRM_CLIENT_SECRET: ${MOCK_CRM_CLIENT_SECRET}
+    volumes:
+      - ./fixtures:/fixtures:ro
+    ports:
+      - "9001:9001"
+
+  provider-a:
+    build: ./mocks/mock-llm
+    environment:
+      PROVIDER_NAME: provider-a
+      MODEL_NAME: provider-a-model
+      API_KEY: ${PROVIDER_A_API_KEY}
+      OTHER_PROVIDERS: provider-b
+    ports:
+      - "9101:9100"
+
+  provider-b:
+    build: ./mocks/mock-llm
+    environment:
+      PROVIDER_NAME: provider-b
+      MODEL_NAME: provider-b-model
+      API_KEY: ${PROVIDER_B_API_KEY}
+      OTHER_PROVIDERS: provider-a
+    ports:
+      - "9102:9100"
+
+  # ----- tools, run on demand through the Makefile -----
+
+  meeting-sim:
+    build: ./mocks/meeting-sim
+    profiles: ["tools"]
+    env_file: .env
+    environment:
+      WEBHOOK_BASE_URL: http://webhook-api:8000
+      TRANSCRIPTS_DIR: /fixtures/transcripts
+      MANIFEST_PATH: /state/sent_calls.jsonl
+    volumes:
+      - ./fixtures:/fixtures:ro
+      - ./state:/state
+
+  tools:
+    build: ./scripts
+    profiles: ["tools"]
+    env_file: .env
+    environment:
+      FIXTURES_DIR: /fixtures
+      MANIFEST_PATH: /state/sent_calls.jsonl
+      PROVIDER_A_URL: http://provider-a:9100
+      PROVIDER_B_URL: http://provider-b:9100
+      ADMIN_URL: http://admin-app:8001
+      URL_MAP: http://localhost:9001=http://mock-crm:9001,http://localhost:8001=http://admin-app:8001
+    volumes:
+      - ./fixtures:/fixtures:ro
+      - ./state:/state
+
+volumes:
+  pgdata:

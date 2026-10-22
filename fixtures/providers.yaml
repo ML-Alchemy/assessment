@@ -1,0 +1,12 @@
+# LLM providers Relay can use. Both have no-training and zero-retention terms.
+# Prices are in USD per 1,000 tokens and are used for cost tracking.
+providers:
+  - name: provider-a
+    model: provider-a-model
+    price_per_1k_input_tokens: 0.003
+    price_per_1k_output_tokens: 0.015
+
+  - name: provider-b
+    model: provider-b-model
+    price_per_1k_input_tokens: 0.0005
+    price_per_1k_output_tokens: 0.0015

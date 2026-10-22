@@ -1,0 +1,465 @@
+{
+  "deals": [
+    {
+      "deal_id": "D-001",
+      "customer_id": "cust_halden",
+      "account": "Harbrook Logistics",
+      "amount": 86000,
+      "currency": "USD",
+      "stage": "Proposal",
+      "close_date": "2026-10-30",
+      "owner": "rep_amara",
+      "created": "2026-07-14"
+    },
+    {
+      "deal_id": "D-002",
+      "customer_id": "cust_halden",
+      "account": "Veltrix Manufacturing",
+      "amount": 120000,
+      "currency": "USD",
+      "stage": "Negotiation",
+      "close_date": "2026-11-15",
+      "owner": "rep_amara",
+      "created": "2026-06-02"
+    },
+    {
+      "deal_id": "D-003",
+      "customer_id": "cust_fernway",
+      "account": "Quentell Health",
+      "amount": 54000,
+      "currency": "USD",
+      "stage": "Contracting",
+      "close_date": "2026-10-24",
+      "owner": "rep_jonas",
+      "created": "2026-05-20"
+    },
+    {
+      "deal_id": "D-004",
+      "customer_id": "cust_fernway",
+      "account": "Brightmoor Retail Group",
+      "amount": 73000,
+      "currency": "USD",
+      "stage": "Evaluation",
+      "close_date": "2026-11-20",
+      "owner": "rep_jonas",
+      "created": "2026-08-01"
+    },
+    {
+      "deal_id": "D-005",
+      "customer_id": "cust_quarry",
+      "account": "Nordwind Energy",
+      "amount": 210000,
+      "currency": "USD",
+      "stage": "Evaluation",
+      "close_date": "2027-01-31",
+      "owner": "rep_tomas",
+      "created": "2026-04-15"
+    },
+    {
+      "deal_id": "D-006",
+      "customer_id": "cust_fernway",
+      "account": "Cassia Foods",
+      "amount": 39000,
+      "currency": "USD",
+      "stage": "Proposal",
+      "close_date": "2026-10-20",
+      "owner": "rep_jonas",
+      "created": "2026-07-01"
+    },
+    {
+      "deal_id": "D-007",
+      "customer_id": "cust_halden",
+      "account": "Aldgate Partners",
+      "amount": 95000,
+      "currency": "USD",
+      "stage": "Negotiation",
+      "close_date": "2026-11-05",
+      "owner": "rep_amara",
+      "created": "2026-06-18"
+    },
+    {
+      "deal_id": "D-008",
+      "customer_id": "cust_quarry",
+      "account": "Taverly Insurance",
+      "amount": 143000,
+      "currency": "USD",
+      "stage": "Commit",
+      "close_date": "2026-10-17",
+      "owner": "rep_tomas",
+      "created": "2026-05-05"
+    }
+  ],
+  "contacts": [
+    {
+      "contact_id": "C-001",
+      "deal_id": "D-001",
+      "name": "Dana Reyes",
+      "title": "VP Operations",
+      "email": "d.reyes@harbrook.example"
+    },
+    {
+      "contact_id": "C-002",
+      "deal_id": "D-001",
+      "name": "Theo Lund",
+      "title": "Ops Analyst",
+      "email": "t.lund@harbrook.example"
+    },
+    {
+      "contact_id": "C-003",
+      "deal_id": "D-002",
+      "name": "Priya Nair",
+      "title": "Director of RevOps",
+      "email": "p.nair@veltrix.example"
+    },
+    {
+      "contact_id": "C-004",
+      "deal_id": "D-002",
+      "name": "Marcus Bell",
+      "title": "CFO",
+      "email": "m.bell@veltrix.example"
+    },
+    {
+      "contact_id": "C-005",
+      "deal_id": "D-003",
+      "name": "Alison Park",
+      "title": "Head of Procurement",
+      "email": "a.park@quentell.example"
+    },
+    {
+      "contact_id": "C-006",
+      "deal_id": "D-004",
+      "name": "Sam Okafor",
+      "title": "IT Director",
+      "email": "s.okafor@brightmoor.example"
+    },
+    {
+      "contact_id": "C-007",
+      "deal_id": "D-005",
+      "name": "Ingrid Vos",
+      "title": "Program Manager",
+      "email": "i.vos@nordwind.example"
+    },
+    {
+      "contact_id": "C-008",
+      "deal_id": "D-005",
+      "name": "Karl Mettler",
+      "title": "Chief Engineer",
+      "email": "k.mettler@nordwind.example"
+    },
+    {
+      "contact_id": "C-009",
+      "deal_id": "D-006",
+      "name": "Luis Herrera",
+      "title": "Finance Manager",
+      "email": "l.herrera@cassia.example"
+    },
+    {
+      "contact_id": "C-010",
+      "deal_id": "D-007",
+      "name": "Felix Chen",
+      "title": "Managing Partner",
+      "email": "f.chen@aldgate.example"
+    },
+    {
+      "contact_id": "C-011",
+      "deal_id": "D-008",
+      "name": "Grace Adeyemi",
+      "title": "COO",
+      "email": "g.adeyemi@taverly.example"
+    }
+  ],
+  "activities": [
+    {
+      "activity_id": "A-D-001-001",
+      "deal_id": "D-001",
+      "type": "meeting",
+      "date": "2026-09-15",
+      "contact_id": "C-001",
+      "direction": "two_way",
+      "summary": "Pricing walkthrough; Dana asked for quarterly billing option"
+    },
+    {
+      "activity_id": "A-D-001-002",
+      "deal_id": "D-001",
+      "type": "email",
+      "date": "2026-09-27",
+      "contact_id": "C-001",
+      "direction": "outbound",
+      "summary": "Quote Q-4417 sent: 86,000 USD annual, quarterly billing included"
+    },
+    {
+      "activity_id": "A-D-001-003",
+      "deal_id": "D-001",
+      "type": "email",
+      "date": "2026-10-03",
+      "contact_id": "C-001",
+      "direction": "outbound",
+      "summary": "Checked in on quote; no reply"
+    },
+    {
+      "activity_id": "A-D-002-001",
+      "deal_id": "D-002",
+      "type": "call",
+      "date": "2026-09-08",
+      "contact_id": "C-003",
+      "direction": "two_way",
+      "summary": "Negotiation kickoff with Priya; she will 'socialize internally'"
+    },
+    {
+      "activity_id": "A-D-002-002",
+      "deal_id": "D-002",
+      "type": "email",
+      "date": "2026-09-22",
+      "contact_id": "C-003",
+      "direction": "two_way",
+      "summary": "Priya asked for security whitepaper; sent same day"
+    },
+    {
+      "activity_id": "A-D-002-003",
+      "deal_id": "D-002",
+      "type": "meeting",
+      "date": "2026-10-02",
+      "contact_id": "C-003",
+      "direction": "two_way",
+      "summary": "Priya again sole attendee; CFO Marcus Bell has never joined"
+    },
+    {
+      "activity_id": "A-D-003-001",
+      "deal_id": "D-003",
+      "type": "email",
+      "date": "2026-09-29",
+      "contact_id": "C-005",
+      "direction": "inbound",
+      "summary": "Alison sent MSA redlines; asked for turnaround this week"
+    },
+    {
+      "activity_id": "A-D-003-002",
+      "deal_id": "D-003",
+      "type": "task",
+      "date": "2026-09-30",
+      "contact_id": null,
+      "direction": "internal",
+      "summary": "Task T-88 opened: legal review of Quentell redlines \u2014 status still OPEN"
+    },
+    {
+      "activity_id": "A-D-003-003",
+      "deal_id": "D-003",
+      "type": "email",
+      "date": "2026-10-07",
+      "contact_id": "C-005",
+      "direction": "inbound",
+      "summary": "Alison: 'any update on the redlines? Our signature window closes Oct 24'"
+    },
+    {
+      "activity_id": "A-D-004-001",
+      "deal_id": "D-004",
+      "type": "call",
+      "date": "2026-09-30",
+      "contact_id": "C-006",
+      "direction": "two_way",
+      "summary": "Demo follow-up call; transcript TR-D004-01 on file"
+    },
+    {
+      "activity_id": "A-D-004-002",
+      "deal_id": "D-004",
+      "type": "email",
+      "date": "2026-10-06",
+      "contact_id": "C-006",
+      "direction": "two_way",
+      "summary": "Sam asked for SSO details; answered"
+    },
+    {
+      "activity_id": "A-D-005-001",
+      "deal_id": "D-005",
+      "type": "meeting",
+      "date": "2026-09-12",
+      "contact_id": "C-007",
+      "direction": "two_way",
+      "summary": "Monthly steering review; pilot metrics on track"
+    },
+    {
+      "activity_id": "A-D-005-002",
+      "deal_id": "D-005",
+      "type": "email",
+      "date": "2026-09-29",
+      "contact_id": "C-008",
+      "direction": "inbound",
+      "summary": "Karl sent integration questions; answered Oct 1"
+    },
+    {
+      "activity_id": "A-D-005-003",
+      "deal_id": "D-005",
+      "type": "meeting",
+      "date": "2026-10-08",
+      "contact_id": "C-007",
+      "direction": "two_way",
+      "summary": "Next steering booked for Nov 10; procurement starts December per their plan"
+    },
+    {
+      "activity_id": "A-D-006-001",
+      "deal_id": "D-006",
+      "type": "call",
+      "date": "2026-09-19",
+      "contact_id": "C-009",
+      "direction": "two_way",
+      "summary": "Pricing call; transcript TR-D006-01 on file"
+    },
+    {
+      "activity_id": "A-D-006-002",
+      "deal_id": "D-006",
+      "type": "email",
+      "date": "2026-09-23",
+      "contact_id": "C-009",
+      "direction": "outbound",
+      "summary": "Quote Q-5102 sent: 39,000 USD"
+    },
+    {
+      "activity_id": "A-D-007-001",
+      "deal_id": "D-007",
+      "type": "call",
+      "date": "2026-09-25",
+      "contact_id": "C-010",
+      "direction": "two_way",
+      "summary": "Terms discussion; transcript TR-D007-01 on file"
+    },
+    {
+      "activity_id": "A-D-007-002",
+      "deal_id": "D-007",
+      "type": "email",
+      "date": "2026-10-05",
+      "contact_id": "C-010",
+      "direction": "two_way",
+      "summary": "Felix asked for reference customer; intro pending"
+    },
+    {
+      "activity_id": "A-D-008-001",
+      "deal_id": "D-008",
+      "type": "email",
+      "date": "2026-10-01",
+      "contact_id": "C-011",
+      "direction": "inbound",
+      "summary": "Grace: ready to sign once the 18% discount is confirmed"
+    },
+    {
+      "activity_id": "A-D-008-002",
+      "deal_id": "D-008",
+      "type": "task",
+      "date": "2026-10-01",
+      "contact_id": null,
+      "direction": "internal",
+      "summary": "Approval AP-204 opened: 18% discount, assigned to dir_sales \u2014 status still PENDING (SLA 2 business days)"
+    },
+    {
+      "activity_id": "A-D-008-003",
+      "deal_id": "D-008",
+      "type": "email",
+      "date": "2026-10-08",
+      "contact_id": "C-011",
+      "direction": "inbound",
+      "summary": "Grace: 'we need the final paperwork this week to hit our board date'"
+    }
+  ],
+  "stage_history": [
+    {
+      "deal_id": "D-001",
+      "stage": "Discovery",
+      "entered": "2026-07-14"
+    },
+    {
+      "deal_id": "D-001",
+      "stage": "Evaluation",
+      "entered": "2026-08-10"
+    },
+    {
+      "deal_id": "D-001",
+      "stage": "Proposal",
+      "entered": "2026-09-18"
+    },
+    {
+      "deal_id": "D-002",
+      "stage": "Discovery",
+      "entered": "2026-06-02"
+    },
+    {
+      "deal_id": "D-002",
+      "stage": "Evaluation",
+      "entered": "2026-07-01"
+    },
+    {
+      "deal_id": "D-002",
+      "stage": "Negotiation",
+      "entered": "2026-09-05"
+    },
+    {
+      "deal_id": "D-003",
+      "stage": "Discovery",
+      "entered": "2026-05-20"
+    },
+    {
+      "deal_id": "D-003",
+      "stage": "Proposal",
+      "entered": "2026-07-30"
+    },
+    {
+      "deal_id": "D-003",
+      "stage": "Contracting",
+      "entered": "2026-09-20"
+    },
+    {
+      "deal_id": "D-004",
+      "stage": "Discovery",
+      "entered": "2026-08-01"
+    },
+    {
+      "deal_id": "D-004",
+      "stage": "Evaluation",
+      "entered": "2026-09-10"
+    },
+    {
+      "deal_id": "D-005",
+      "stage": "Discovery",
+      "entered": "2026-04-15"
+    },
+    {
+      "deal_id": "D-005",
+      "stage": "Evaluation",
+      "entered": "2026-06-20"
+    },
+    {
+      "deal_id": "D-006",
+      "stage": "Discovery",
+      "entered": "2026-07-01"
+    },
+    {
+      "deal_id": "D-006",
+      "stage": "Proposal",
+      "entered": "2026-09-08"
+    },
+    {
+      "deal_id": "D-007",
+      "stage": "Discovery",
+      "entered": "2026-06-18"
+    },
+    {
+      "deal_id": "D-007",
+      "stage": "Negotiation",
+      "entered": "2026-08-25"
+    },
+    {
+      "deal_id": "D-008",
+      "stage": "Discovery",
+      "entered": "2026-05-05"
+    },
+    {
+      "deal_id": "D-008",
+      "stage": "Negotiation",
+      "entered": "2026-08-15"
+    },
+    {
+      "deal_id": "D-008",
+      "stage": "Commit",
+      "entered": "2026-09-26"
+    }
+  ],
+  "as_of": "2026-10-09"
+}

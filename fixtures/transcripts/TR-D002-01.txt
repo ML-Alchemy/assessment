@@ -1,0 +1,13 @@
+transcript_id: TR-D002-01
+deal_id: D-002
+customer: cust_halden
+date: 2026-10-02
+participants: rep_amara, Priya Nair (Director of RevOps)
+---
+[00:01:30] Priya Nair: Thanks for sending the security whitepaper so quickly. Our IT team had no major concerns.
+[00:02:45] rep_amara: Great. Last time you mentioned socializing the proposal internally. How has that gone?
+[00:03:20] Priya Nair: Mostly positive. The open question is budget timing. Marcus, our CFO, wants to see the three-year cost before he signs off.
+[00:04:10] rep_amara: Would it help if I joined a short call with Marcus to walk through the numbers?
+[00:04:55] Priya Nair: Maybe. He prefers to review things on his own first. Can you send a cost summary I can forward?
+[00:05:40] rep_amara: I'll send it by Friday, with the three-year view and the payment options.
+[00:06:15] Priya Nair: Perfect. If he's comfortable, we could still sign before November 15.

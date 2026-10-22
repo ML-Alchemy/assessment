@@ -1,0 +1,12 @@
+transcript_id: TR-D005-01
+deal_id: D-005
+customer: cust_quarry
+date: 2026-10-08
+participants: rep_tomas, Ingrid Vos (Program Manager)
+---
+[00:01:10] Ingrid Vos: The pilot metrics are still on track. Karl's team was happy with the answers on the integration questions.
+[00:02:30] rep_tomas: Glad to hear it. Anything they'd want to see before procurement starts?
+[00:03:15] Ingrid Vos: A short plan for the production rollout across the three regional sites. Procurement kicks off in December, as planned.
+[00:04:05] rep_tomas: I'll put together a draft rollout plan for the next steering review.
+[00:04:50] Ingrid Vos: That works. We have the next steering session booked for November 10.
+[00:05:30] rep_tomas: I'll send the draft a week before, so your team has time to review it.

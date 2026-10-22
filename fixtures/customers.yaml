@@ -1,0 +1,20 @@
+# Relay customers: companies that subscribe to Relay.
+# allowed_llm_providers is each customer's contractual restriction.
+customers:
+  - id: cust_fernway
+    name: Fernway Software
+    allowed_llm_providers: [provider-a, provider-b]
+    reps: [rep_jonas]
+    deals: [D-003, D-004, D-006]
+
+  - id: cust_halden
+    name: Halden Analytics
+    allowed_llm_providers: [provider-a]
+    reps: [rep_amara]
+    deals: [D-001, D-002, D-007]
+
+  - id: cust_quarry
+    name: Quarry Labs
+    allowed_llm_providers: [provider-b]
+    reps: [rep_tomas]
+    deals: [D-005, D-008]

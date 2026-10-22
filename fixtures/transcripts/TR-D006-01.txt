@@ -1,0 +1,9 @@
+transcript_id: TR-D006-01
+deal_id: D-006
+customer: cust_fernway
+date: 2026-09-19
+participants: rep_jonas, Luis Herrera (Finance Manager)
+---
+[00:01:30] Luis Herrera: Before we go through the numbers — heads up that finance announced a spending review this quarter. New software over 25k needs an extra sign-off now.
+[00:04:02] rep_jonas: Understood. Would phasing the rollout help get under that bar?
+[00:04:45] Luis Herrera: Possibly. Send the quote as discussed and I'll see which path is faster. Don't read too much into slow replies — the review has everyone buried.

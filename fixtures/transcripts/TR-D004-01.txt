@@ -1,0 +1,10 @@
+transcript_id: TR-D004-01
+deal_id: D-004
+customer: cust_fernway
+date: 2026-09-30
+participants: rep_jonas, Sam Okafor (IT Director)
+---
+[00:02:10] Sam Okafor: The demo landed well with my team. One thing I should flag — we're also running an evaluation with Pipeline IQ in parallel. Their rep has been pushing hard on price.
+[00:03:05] rep_jonas: Good to know. What matters most in how you'll decide?
+[00:03:40] Sam Okafor: Honestly, integration effort. Pipeline IQ claims a two-week rollout. If you can show something comparable, price won't be the deciding factor.
+[00:05:12] Sam Okafor: We want a decision before Thanksgiving.
