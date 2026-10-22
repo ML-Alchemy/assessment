@@ -1,0 +1,24 @@
+groups:
+  - name: relay-customer-outcomes
+    rules:
+      - alert: RelayCallsStuck
+        expr: max(relay_oldest_received_call_age_seconds) > 300
+        for: 5m
+        labels: { severity: page }
+        annotations:
+          summary: "Relay calls are waiting more than five minutes"
+          description: "At least one customer call is not progressing and may be missing its CRM update."
+      - alert: RelayCallFailureRateHigh
+        expr: sum(rate(relay_calls_failed_total[10m])) / clamp_min(sum(rate(relay_calls_received_total[10m])), 0.001) > 0.05
+        for: 10m
+        labels: { severity: page }
+        annotations:
+          summary: "More than 5% of Relay calls are failing"
+          description: "Customers may be missing summaries or CRM follow-up tasks."
+      - alert: RelayLLMPolicyDenials
+        expr: increase(relay_llm_policy_denied_total[5m]) > 0
+        for: 0m
+        labels: { severity: warning }
+        annotations:
+          summary: "An LLM provider policy violation was blocked"
+          description: "Investigate the call and caller identity; the gateway denied the request before transcript egress."

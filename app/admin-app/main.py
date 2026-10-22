@@ -5,7 +5,8 @@ OAuth flow with the CRM, and stores the tokens it receives.
 """
 
 import html
-import json
+import hashlib
+import hmac
 import logging
 import os
 import secrets
@@ -27,6 +28,7 @@ CRM_CLIENT_SECRET = os.environ["MOCK_CRM_CLIENT_SECRET"]
 ADMIN_PUBLIC_URL = os.environ.get("ADMIN_PUBLIC_URL", "http://localhost:8001")
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
+ADMIN_STATE_KEY = os.environ["ADMIN_STATE_KEY"]
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 TOKEN_CIPHER = Fernet(os.environ["CRM_TOKEN_KEY"])
 
@@ -96,18 +98,35 @@ def index(_: str = Depends(require_admin)):
 
 @app.get("/connect/{customer_id}")
 def connect(customer_id: str, _: str = Depends(require_admin)):
+    with db() as conn:
+        exists = conn.execute("SELECT 1 FROM customers WHERE id = %s", (customer_id,)).fetchone()
+    if not exists:
+        raise HTTPException(status_code=404, detail="Unknown customer")
+    nonce = secrets.token_urlsafe(32)
+    signature = hmac.new(ADMIN_STATE_KEY.encode(), f"{customer_id}:{nonce}".encode(), hashlib.sha256).hexdigest()
+    state = f"{customer_id}:{nonce}:{signature}"
     params = {
         "client_id": CRM_CLIENT_ID,
         "redirect_uri": f"{ADMIN_PUBLIC_URL}/callback",
         "account": customer_id,
-        "state": f"{customer_id}:{secrets.token_urlsafe(8)}",
+        "state": f"{customer_id}:{state}",
     }
     return RedirectResponse(f"{CRM_PUBLIC_URL}/oauth/authorize?{urlencode(params)}", status_code=302)
 
 
 @app.get("/callback")
 def callback(code: str, state: str):
-    customer_id = state.split(":", 1)[0]
+    parts = state.split(":")
+    if len(parts) != 3:
+        raise HTTPException(status_code=400, detail="Invalid OAuth state")
+    customer_id, nonce, supplied_signature = parts
+    expected_signature = hmac.new(ADMIN_STATE_KEY.encode(), f"{customer_id}:{nonce}".encode(), hashlib.sha256).hexdigest()
+    if len(nonce) < 32 or not hmac.compare_digest(supplied_signature, expected_signature):
+        raise HTTPException(status_code=400, detail="Invalid OAuth state")
+    with db() as conn:
+        exists = conn.execute("SELECT 1 FROM customers WHERE id = %s", (customer_id,)).fetchone()
+    if not exists:
+        raise HTTPException(status_code=400, detail="Invalid OAuth customer")
     r = httpx.post(
         f"{CRM_URL}/oauth/token",
         data={
@@ -120,7 +139,8 @@ def callback(code: str, state: str):
         timeout=10,
     )
     if r.status_code != 200:
-        raise HTTPException(status_code=400, detail=f"CRM connection failed: {r.text}")
+        log.warning("CRM OAuth token exchange failed for customer %s (status %d)", customer_id, r.status_code)
+        raise HTTPException(status_code=400, detail="CRM connection failed")
     tok = r.json()
     expires = datetime.now(timezone.utc) + timedelta(seconds=tok["expires_in"])
     with db() as conn:

@@ -15,22 +15,31 @@ if env_path.exists():
 
 db_password = secrets.token_urlsafe(16)
 values = {
-    "LOG_LEVEL": "DEBUG",
-    "LOG_FORMAT": "text",
+    "LOG_LEVEL": "INFO",
+    "LOG_FORMAT": "json",
+    "MAX_PENDING_PER_CUSTOMER": "100",
     "POSTGRES_PASSWORD": db_password,
-    "DATABASE_URL": f"postgresql://postgres:{db_password}@postgres:5432/relay",
+    "DATABASE_URL": f"postgresql://relay:{db_password}@postgres:5432/relay?connect_timeout=5",
     "MOCK_CRM_URL": "http://mock-crm:9001",
     "MOCK_CRM_CLIENT_ID": "relay-local",
     "MOCK_CRM_CLIENT_SECRET": secrets.token_urlsafe(24),
+    "ADMIN_USERNAME": "relay-admin",
+    "ADMIN_PASSWORD": secrets.token_urlsafe(32),
+    "ADMIN_STATE_KEY": secrets.token_urlsafe(32),
     "CRM_TOKEN_KEY": base64.urlsafe_b64encode(os.urandom(32)).decode(),
-    "PROVIDER_A_URL": "http://provider-a:9100",
-    "PROVIDER_A_API_KEY": "pa-" + secrets.token_urlsafe(24),
-    "PROVIDER_B_URL": "http://provider-b:9100",
-    "PROVIDER_B_API_KEY": "pb-" + secrets.token_urlsafe(24),
+    "LLM_GATEWAY_KEY": "gw-" + secrets.token_urlsafe(32),
+    "PROVIDER_A_URL": "http://llm-policy-a:9200",
+    "PROVIDER_A_API_KEY": "gw-" + "PLACEHOLDER",
+    "PROVIDER_B_URL": "http://llm-policy-b:9200",
+    "PROVIDER_B_API_KEY": "gw-" + "PLACEHOLDER",
+    "UPSTREAM_PROVIDER_A_API_KEY": "pa-" + secrets.token_urlsafe(24),
+    "UPSTREAM_PROVIDER_B_API_KEY": "pb-" + secrets.token_urlsafe(24),
     "WEBHOOK_SECRET_CUST_FERNWAY": "whsec_" + secrets.token_urlsafe(24),
     "WEBHOOK_SECRET_CUST_HALDEN": "whsec_" + secrets.token_urlsafe(24),
     "WEBHOOK_SECRET_CUST_QUARRY": "whsec_" + secrets.token_urlsafe(24),
 }
+values["PROVIDER_A_API_KEY"] = values["LLM_GATEWAY_KEY"]
+values["PROVIDER_B_API_KEY"] = values["LLM_GATEWAY_KEY"]
 env_path.write_text("".join(f"{k}={v}\n" for k, v in values.items()))
 state = env_path.parent / "state"
 state.mkdir(exist_ok=True)

@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install test dependencies
+        run: python -m pip install --upgrade pip pytest ruff bandit pyyaml httpx fastapi 'psycopg[binary]' cryptography
+      - name: Syntax compile
+        run: python -m compileall -q app scripts
+      - name: Lint application
+        run: ruff check app scripts --output-format=github
+      - name: Security scan
+        run: bandit -r app scripts -x app/db -ll
+      - name: Dependency vulnerability scan
+        run: pip install pip-audit && pip-audit -r app/worker/requirements.txt -r app/webhook-api/requirements.txt -r app/admin-app/requirements.txt
+      - name: Unit tests
+        run: pytest -q
+      - uses: hashicorp/setup-terraform@v3
+        with: { terraform_version: '1.9.8' }
+      - name: Terraform format and validate
+        working-directory: infra/terraform
+        run: terraform fmt -check -recursive && terraform init -backend=false && terraform validate

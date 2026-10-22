@@ -1,119 +1,147 @@
 name: relay
-
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16.4
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: relay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run make init}
       POSTGRES_DB: relay
     volumes:
       - ./app/db:/docker-entrypoint-initdb.d:ro
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d relay"]
+      test: ["CMD-SHELL", "pg_isready -U relay -d relay"]
       interval: 2s
       timeout: 3s
       retries: 30
+    networks: [app]
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
 
   webhook-api:
     build: ./app/webhook-api
     env_file: .env
-    ports:
-      - "8000:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
+    environment: { DATABASE_URL: "${DATABASE_URL}" }
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on: { postgres: { condition: service_healthy } }
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 12 }
+    networks: [app]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 384m
+    cpus: 1.0
 
   worker:
     build: ./app/worker
     env_file: .env
-    deploy:
-      replicas: 2
     depends_on:
-      postgres:
-        condition: service_healthy
-      mock-crm:
-        condition: service_started
-      provider-a:
-        condition: service_started
-      provider-b:
-        condition: service_started
+      postgres: { condition: service_healthy }
+      llm-policy-a: { condition: service_healthy }
+      llm-policy-b: { condition: service_healthy }
+    networks: [app]
+    restart: unless-stopped
+    healthcheck: { test: ["CMD", "python", "-c", "import os, psycopg; c=psycopg.connect(os.environ['DATABASE_URL'], connect_timeout=2); c.close()"], interval: 10s, timeout: 4s, retries: 5 }
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1.0
+    deploy: { replicas: 2 }
 
   admin-app:
     build: ./app/admin-app
     env_file: .env
-    environment:
-      ADMIN_PUBLIC_URL: http://localhost:8001
-      MOCK_CRM_PUBLIC_URL: http://localhost:9001
-    ports:
-      - "8001:8001"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # ----- mock external systems -----
+    environment: { ADMIN_PUBLIC_URL: http://localhost:8001, MOCK_CRM_PUBLIC_URL: http://localhost:9001 }
+    ports: ["127.0.0.1:8001:8001"]
+    depends_on: { postgres: { condition: service_healthy } }
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 12 }
+    networks: [app]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 384m
 
   mock-crm:
     build: ./mocks/mock-crm
-    environment:
-      DEALS_PATH: /fixtures/deals.json
-      MOCK_CRM_CLIENT_ID: ${MOCK_CRM_CLIENT_ID}
-      MOCK_CRM_CLIENT_SECRET: ${MOCK_CRM_CLIENT_SECRET}
-    volumes:
-      - ./fixtures:/fixtures:ro
-    ports:
-      - "9001:9001"
+    environment: { DEALS_PATH: /fixtures/deals.json, MOCK_CRM_CLIENT_ID: "${MOCK_CRM_CLIENT_ID}", MOCK_CRM_CLIENT_SECRET: "${MOCK_CRM_CLIENT_SECRET}" }
+    volumes: ["./fixtures:/fixtures:ro"]
+    ports: ["127.0.0.1:9001:9001"]
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9001/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 12 }
+    networks: [app]
+    restart: unless-stopped
 
   provider-a:
     build: ./mocks/mock-llm
-    environment:
-      PROVIDER_NAME: provider-a
-      MODEL_NAME: provider-a-model
-      API_KEY: ${PROVIDER_A_API_KEY}
-      OTHER_PROVIDERS: provider-b
-    ports:
-      - "9101:9100"
+    environment: { PROVIDER_NAME: provider-a, MODEL_NAME: provider-a-model, API_KEY: "${UPSTREAM_PROVIDER_A_API_KEY}", OTHER_PROVIDERS: provider-b }
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9100/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 12 }
+    networks: [llm-backend]
+    restart: unless-stopped
 
   provider-b:
     build: ./mocks/mock-llm
-    environment:
-      PROVIDER_NAME: provider-b
-      MODEL_NAME: provider-b-model
-      API_KEY: ${PROVIDER_B_API_KEY}
-      OTHER_PROVIDERS: provider-a
-    ports:
-      - "9102:9100"
+    environment: { PROVIDER_NAME: provider-b, MODEL_NAME: provider-b-model, API_KEY: "${UPSTREAM_PROVIDER_B_API_KEY}", OTHER_PROVIDERS: provider-a }
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9100/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 12 }
+    networks: [llm-backend]
+    restart: unless-stopped
 
-  # ----- tools, run on demand through the Makefile -----
+  llm-policy-a:
+    build: ./app/llm-policy
+    env_file: .env
+    environment: { DATABASE_URL: "${DATABASE_URL}", POLICY_FILE: /fixtures/customers.yaml, POLICY_PROVIDER: provider-a, UPSTREAM_URL: http://provider-a:9100, UPSTREAM_API_KEY: "${UPSTREAM_PROVIDER_A_API_KEY}", LLM_GATEWAY_KEY: "${LLM_GATEWAY_KEY}" }
+    volumes: ["./fixtures:/fixtures:ro"]
+    depends_on: { postgres: { condition: service_healthy }, provider-a: { condition: service_started } }
+    networks: [app, llm-backend]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9200/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 10 }
+
+  llm-policy-b:
+    build: ./app/llm-policy
+    env_file: .env
+    environment: { DATABASE_URL: "${DATABASE_URL}", POLICY_FILE: /fixtures/customers.yaml, POLICY_PROVIDER: provider-b, UPSTREAM_URL: http://provider-b:9100, UPSTREAM_API_KEY: "${UPSTREAM_PROVIDER_B_API_KEY}", LLM_GATEWAY_KEY: "${LLM_GATEWAY_KEY}" }
+    volumes: ["./fixtures:/fixtures:ro"]
+    depends_on: { postgres: { condition: service_healthy }, provider-b: { condition: service_started } }
+    networks: [app, llm-backend]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9200/health', timeout=2)"], interval: 5s, timeout: 3s, retries: 10 }
+
+  retention:
+    build: ./scripts
+    env_file: .env
+    environment: { DATABASE_URL: "${DATABASE_URL}", RETENTION_INTERVAL_SECONDS: "3600" }
+    command: ["python", "retention.py"]
+    depends_on: { postgres: { condition: service_healthy } }
+    networks: [app]
+    restart: unless-stopped
+    healthcheck: { test: ["CMD", "python", "-c", "import os, psycopg; c=psycopg.connect(os.environ['DATABASE_URL'], connect_timeout=2); c.close()"], interval: 10s, timeout: 4s, retries: 5 }
 
   meeting-sim:
     build: ./mocks/meeting-sim
-    profiles: ["tools"]
+    profiles: [tools]
     env_file: .env
-    environment:
-      WEBHOOK_BASE_URL: http://webhook-api:8000
-      TRANSCRIPTS_DIR: /fixtures/transcripts
-      MANIFEST_PATH: /state/sent_calls.jsonl
-    volumes:
-      - ./fixtures:/fixtures:ro
-      - ./state:/state
+    environment: { WEBHOOK_BASE_URL: http://webhook-api:8000, TRANSCRIPTS_DIR: /fixtures/transcripts, MANIFEST_PATH: /state/sent_calls.jsonl }
+    volumes: ["./fixtures:/fixtures:ro", "./state:/state"]
+    networks: [app]
 
   tools:
     build: ./scripts
-    profiles: ["tools"]
+    profiles: [tools]
     env_file: .env
-    environment:
-      FIXTURES_DIR: /fixtures
-      MANIFEST_PATH: /state/sent_calls.jsonl
-      PROVIDER_A_URL: http://provider-a:9100
-      PROVIDER_B_URL: http://provider-b:9100
-      ADMIN_URL: http://admin-app:8001
-      URL_MAP: http://localhost:9001=http://mock-crm:9001,http://localhost:8001=http://admin-app:8001
-    volumes:
-      - ./fixtures:/fixtures:ro
-      - ./state:/state
+    environment: { FIXTURES_DIR: /fixtures, MANIFEST_PATH: /state/sent_calls.jsonl, PROVIDER_A_URL: http://provider-a:9100, PROVIDER_B_URL: http://provider-b:9100, ADMIN_URL: http://admin-app:8001, URL_MAP: http://localhost:9001=http://mock-crm:9001,http://localhost:8001=http://admin-app:8001 }
+    volumes: ["./fixtures:/fixtures:ro", "./state:/state"]
+    networks: [app, llm-backend]
 
+networks:
+  app: {}
+  llm-backend:
+    internal: true
 volumes:
-  pgdata:
+  pgdata: {}

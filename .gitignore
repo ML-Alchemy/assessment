@@ -3,3 +3,12 @@ __pycache__/
 .venv/
 .DS_Store
 state/
+
+.env
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+coverage.xml
+.pytest_cache/
+.ruff_cache/

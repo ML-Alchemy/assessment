@@ -9,6 +9,8 @@ SERVICES = {
     "mock-crm": "http://mock-crm:9001/health",
     "provider-a": "http://provider-a:9100/health",
     "provider-b": "http://provider-b:9100/health",
+    "llm-policy-a": "http://llm-policy-a:9200/health",
+    "llm-policy-b": "http://llm-policy-b:9200/health",
 }
 
 healthy = True

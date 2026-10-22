@@ -19,7 +19,7 @@ CREATE TABLE calls (
     customer_id    TEXT NOT NULL REFERENCES customers(id),
     deal_id        TEXT NOT NULL,
     transcript_id  TEXT,
-    transcript     TEXT NOT NULL,
+    transcript     TEXT,
     status         TEXT NOT NULL DEFAULT 'received'
                    CHECK (status IN ('received', 'in_progress', 'done', 'failed')),
     attempts       INTEGER NOT NULL DEFAULT 0,
@@ -45,3 +45,7 @@ CREATE TABLE summaries (
     completion_tokens  INTEGER,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+
+-- Index supports the 90-day raw transcript retention sweep.
+CREATE INDEX calls_retention_idx ON calls (received_at) WHERE transcript IS NOT NULL;

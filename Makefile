@@ -20,7 +20,7 @@ init:
 
 up:
 	@test -f .env || (echo "Run 'make init' first." && exit 1)
-	$(COMPOSE) up -d --build
+	$(COMPOSE) up -d --build --wait
 	$(COMPOSE) --profile tools build meeting-sim tools
 
 seed:
