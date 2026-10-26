@@ -7,9 +7,9 @@ signature, and stores each call for the worker to process.
 import hashlib
 import hmac
 import json
-import time
 import logging
 import os
+import time
 
 import psycopg
 from fastapi import FastAPI, HTTPException, Request

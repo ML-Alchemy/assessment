@@ -1,5 +1,8 @@
 """Hourly best-effort raw transcript retention sweep."""
-import logging, os, time
+import logging
+import os
+import time
+
 import psycopg
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(message)s")

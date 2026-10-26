@@ -4,10 +4,10 @@ import json
 import logging
 import os
 from pathlib import Path
-import yaml
 
 import httpx
 import psycopg
+import yaml
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 

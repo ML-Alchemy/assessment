@@ -9,7 +9,7 @@ import json
 import logging
 import os
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 import psycopg
@@ -130,7 +130,7 @@ def summarize(conn, customer_id: str, call_id: str, transcript: str):
             response = call_llm(provider, customer_id, call_id, transcript)
             result = json.loads(response["choices"][0]["message"]["content"])
             break
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - any provider error means try the next allowed provider
             log.warning("%s failed (%s), trying the next allowed provider", provider, e, extra={"customer_id": customer_id, "call_id": call_id})
     else:
         raise RuntimeError("All LLM providers failed")
@@ -155,7 +155,7 @@ def refresh_crm_token(conn, customer_id: str, refresh_token: str) -> str:
     )
     r.raise_for_status()
     tok = r.json()
-    expires = datetime.now(timezone.utc) + timedelta(seconds=tok["expires_in"])
+    expires = datetime.now(UTC) + timedelta(seconds=tok["expires_in"])
     conn.execute(
         """UPDATE customers SET crm_access_token = %s, crm_refresh_token = %s, crm_token_expires_at = %s
            WHERE id = %s""",
@@ -172,7 +172,7 @@ def crm_token(conn, customer_id: str, force_refresh: bool = False) -> str:
     access, refresh = decrypt(access), decrypt(refresh)
     if not refresh:
         raise RuntimeError(f"CRM not connected for {customer_id}")
-    if force_refresh or not access or expires <= datetime.now(timezone.utc) + timedelta(seconds=30):
+    if force_refresh or not access or expires <= datetime.now(UTC) + timedelta(seconds=30):
         return refresh_crm_token(conn, customer_id, refresh)
     return access
 
@@ -245,7 +245,7 @@ def process(conn, row) -> None:
         write_to_crm(conn, customer_id, deal_id, call_id, result)
         conn.execute("UPDATE calls SET status = 'done', completed_at = now(), error = NULL WHERE id = %s", (ref,))
         log.info("Finished call %s", call_id, extra=ids)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - any failure is retried or marked failed, never dropped
         if attempts < MAX_ATTEMPTS:
             delay = 2 ** attempts
             log.warning("Call %s failed (%s); retrying in %ds", call_id, e, delay, extra=ids)

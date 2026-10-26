@@ -4,14 +4,15 @@ Where customers connect their CRM to Relay. Lists customers, starts the
 OAuth flow with the CRM, and stores the tokens it receives.
 """
 
-import html
 import hashlib
 import hmac
+import html
 import json
 import logging
 import os
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+from typing import Annotated
 from urllib.parse import urlencode
 
 import httpx
@@ -65,7 +66,7 @@ app = FastAPI(title="Relay admin")
 basic = HTTPBasic()
 
 
-def require_admin(creds: HTTPBasicCredentials = Depends(basic)) -> str:
+def require_admin(creds: Annotated[HTTPBasicCredentials, Depends(basic)]) -> str:
     if creds.username != ADMIN_USERNAME or creds.password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Unauthorized", headers={"WWW-Authenticate": "Basic"})
     return creds.username
@@ -143,7 +144,7 @@ def callback(code: str, state: str):
         log.warning("CRM OAuth token exchange failed for customer %s (status %d)", customer_id, r.status_code)
         raise HTTPException(status_code=400, detail="CRM connection failed")
     tok = r.json()
-    expires = datetime.now(timezone.utc) + timedelta(seconds=tok["expires_in"])
+    expires = datetime.now(UTC) + timedelta(seconds=tok["expires_in"])
     with db() as conn:
         conn.execute(
             """UPDATE customers

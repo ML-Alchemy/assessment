@@ -135,7 +135,7 @@ services:
     build: ./scripts
     profiles: [tools]
     env_file: .env
-    environment: { FIXTURES_DIR: /fixtures, MANIFEST_PATH: /state/sent_calls.jsonl, PROVIDER_A_URL: http://provider-a:9100, PROVIDER_B_URL: http://provider-b:9100, ADMIN_URL: http://admin-app:8001, URL_MAP: http://localhost:9001=http://mock-crm:9001,http://localhost:8001=http://admin-app:8001 }
+    environment: { FIXTURES_DIR: /fixtures, MANIFEST_PATH: /state/sent_calls.jsonl, PROVIDER_A_URL: http://provider-a:9100, PROVIDER_B_URL: http://provider-b:9100, ADMIN_URL: http://admin-app:8001, URL_MAP: "http://localhost:9001=http://mock-crm:9001,http://localhost:8001=http://admin-app:8001" }
     volumes: ["./fixtures:/fixtures:ro", "./state:/state"]
     networks: [app, llm-backend]
 
