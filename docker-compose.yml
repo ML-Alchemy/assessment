@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: relay
     volumes:
       - ./app/db:/docker-entrypoint-initdb.d:ro
-      - pgdata:/var/lib/postgresql/data
+      - pgdata16:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U relay -d relay"]
       interval: 2s
@@ -144,4 +144,4 @@ networks:
   llm-backend:
     internal: true
 volumes:
-  pgdata: {}
+  pgdata16: {}

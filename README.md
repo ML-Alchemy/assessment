@@ -18,6 +18,8 @@ make burst && make check
 
 `make init` creates local-only credentials in `.env`; do not commit or share this file. `make up` builds and starts the stack. `make seed` connects each mock CRM via OAuth. `make burst` sends the fixture burst, and `make check` reports missing/duplicate calls, latency, and provider violations. `make reset` removes the local database volume and state; it is destructive.
 
+If you have run another copy of this starter on the same machine, stop it first (`docker compose down` in that directory): both use the Compose project name `relay` and host ports 8000, 8001 and 9001. This submission uses its own Postgres volume (`relay_pgdata16`), so an older Postgres 15 volume from the original starter does not block startup. The CI `integration` job runs these exact five commands on a clean Ubuntu runner on every push.
+
 ## Architecture
 
 ```text

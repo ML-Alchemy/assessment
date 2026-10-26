@@ -7,6 +7,7 @@ OAuth flow with the CRM, and stores the tokens it receives.
 import html
 import hashlib
 import hmac
+import json
 import logging
 import os
 import secrets
@@ -109,7 +110,7 @@ def connect(customer_id: str, _: str = Depends(require_admin)):
         "client_id": CRM_CLIENT_ID,
         "redirect_uri": f"{ADMIN_PUBLIC_URL}/callback",
         "account": customer_id,
-        "state": f"{customer_id}:{state}",
+        "state": state,
     }
     return RedirectResponse(f"{CRM_PUBLIC_URL}/oauth/authorize?{urlencode(params)}", status_code=302)
 
