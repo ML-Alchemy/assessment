@@ -36,6 +36,7 @@ services:
   worker:
     build: ./app/worker
     env_file: .env
+    environment: { MAX_ATTEMPTS: "8" }
     depends_on:
       postgres: { condition: service_healthy }
       llm-policy-a: { condition: service_healthy }
